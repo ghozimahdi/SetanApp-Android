@@ -3,6 +3,7 @@ package com.blank.setanapps
 import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import java.io.IOException
@@ -14,22 +15,32 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("service", "onCreate")
+        Log.d(TAG, "onCreate")
         player = MediaPlayer()
         try {
             var afd = assets.openFd("setan.mp3")
             player?.setDataSource(afd.fileDescriptor)
-            player?.isLooping = true
+            player?.setVolume(100F, 100F)
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("service", "onStartCommand")
+        Log.d(TAG, "onStartCommand")
         try {
             player!!.prepare()
-            player!!.start()
+
+            //todo please remove this
+            val handler = Handler()
+            val runnable: Runnable = object : Runnable {
+                override fun run() {
+                    player!!.start()
+                    handler.postDelayed(this, 1800000) //repeat time
+                }
+            }
+            runnable.run()
+
         } catch (e: IOException) {
             e.printStackTrace()
         }
