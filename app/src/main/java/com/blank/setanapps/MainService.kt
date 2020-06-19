@@ -18,7 +18,7 @@ class MainService : Service() {
         Log.d(TAG, "onCreate")
         player = MediaPlayer()
         try {
-            var afd = assets.openFd("setan.mp3")
+            val afd = assets.openFd("setan.mp3")
             player?.setDataSource(afd.fileDescriptor)
             player?.setVolume(100F, 100F)
         } catch (e: IOException) {
@@ -36,7 +36,7 @@ class MainService : Service() {
             val runnable: Runnable = object : Runnable {
                 override fun run() {
                     player!!.start()
-                    handler.postDelayed(this, 1800000) //repeat time
+                    handler.postDelayed(this, 100000) //repeat time
                 }
             }
             runnable.run()
