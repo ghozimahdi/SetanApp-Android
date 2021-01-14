@@ -2,45 +2,31 @@ package com.blank.setanapps
 
 import android.app.Service
 import android.content.Intent
-import android.media.MediaPlayer
-import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 
 class MainService : Service() {
     private val TAG = MainService::class.java.simpleName
-    var player: MediaPlayer? = null
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate")
-        player = MediaPlayer()
-        try {
-            val afd = assets.openFd("setan.mp3")
-            player?.setDataSource(afd.fileDescriptor)
-            player?.setVolume(100F, 100F)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand")
         try {
-            player!!.prepare()
+            val periodicRequest =
+                PeriodicWorkRequestBuilder<WorkPeriodic>(15, TimeUnit.MINUTES, 14, TimeUnit.MINUTES)
+                    .build()
 
-            //todo please remove this
-            val handler = Handler()
-            val runnable: Runnable = object : Runnable {
-                override fun run() {
-                    player!!.start()
-                    handler.postDelayed(this, 100000) //repeat time
-                }
-            }
-            runnable.run()
-
+            WorkManager.getInstance(this)
+                .enqueue(periodicRequest)
         } catch (e: IOException) {
             e.printStackTrace()
         }
